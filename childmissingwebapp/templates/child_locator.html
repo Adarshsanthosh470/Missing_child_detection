@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Child Locator from Video</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 text-white p-10">
+
+<h1 class="text-3xl font-bold mb-6">Child Locator – Video Scan</h1>
+
+<form method="POST" enctype="multipart/form-data" class="bg-gray-800 p-6 rounded-lg">
+    {% csrf_token %}
+    <label class="text-lg">Upload Video:</label>
+    <input type="file" name="video" accept="video/*" required class="block mt-2 mb-4 text-black">
+
+    <button class="bg-blue-600 px-5 py-2 rounded hover:bg-blue-700">
+        Scan Video
+    </button>
+</form>
+
+{% if status %}
+    <div class="mt-6 bg-gray-800 p-5 rounded">
+        <p class="text-xl mb-3">{{ status }}</p>
+
+        {% if match_image %}
+            <img src="{{ match_image }}" class="w-64 rounded mb-3">
+            <p class="text-lg">Match Confidence: <b>{{ confidence }}</b></p>
+        {% endif %}
+    </div>
+{% endif %}
+
+</body>
+</html>

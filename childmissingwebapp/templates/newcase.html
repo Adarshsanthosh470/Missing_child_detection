@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Missing Child Case</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background-color: #f4f6f9; 
+        }
+        .form-card {
+            background-color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border-radius: 15px;
+        }
+        .section-header {
+            background-color: #3b82f6;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        input, select, textarea {
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 py-12">
+    <div class="container mx-auto max-w-4xl px-4">
+        <div class="form-card p-10">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Report a New Missing Child Case</h2>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Child Information Section -->
+                <div class="mb-8">
+                    <div class="section-header">
+                        <h3 class="text-xl font-semibold">Child Details</h3>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <input type="text" class="w-full p-3 rounded-md" id="childname" name="childname" placeholder="Child's Name" required>
+                        <input type="date" class="w-full p-3 rounded-md" id="dob" name="dob" required>
+                        
+                        <select class="w-full p-3 rounded-md" id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                        
+                        <div class="flex space-x-4">
+                            <input type="number" class="w-full p-3 rounded-md" id="height" name="height" placeholder="Height (cm)" required>
+                            <input type="number" class="w-full p-3 rounded-md" id="weight" name="weight" placeholder="Weight (kg)" required>
+                        </div>
+                        
+                        <input type="text" class="w-full p-3 rounded-md" id="eye_color" name="eye_color" placeholder="Eye Color" required>
+                        <input type="text" class="w-full p-3 rounded-md" id="hair_color" name="hair_color" placeholder="Hair Color" required>
+                        
+                        <div class="col-span-2">
+                            <label class="block mb-2 text-gray-700">Child's Photo</label>
+                            <input type="file" class="w-full p-3 bg-white border-2 border-gray-300 rounded-md" id="photo" name="photo" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location & Contact Sections -->
+                <div class="mb-8">
+                    <div class="section-header">
+                        <h3 class="text-xl font-semibold">Last Seen & Contact Information</h3>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <input type="datetime-local" class="w-full p-3 rounded-md" id="last_seen_date" name="last_seen_date" required>
+                        <input type="text" class="w-full p-3 rounded-md" id="last_seen_location" name="last_seen_location" placeholder="Last Seen Location" required>
+                        
+                        <input type="text" class="w-full p-3 rounded-md" id="guardian_name" name="guardian_name" placeholder="Guardian's Name" required>
+                        <input type="tel" class="w-full p-3 rounded-md" id="guardian_phone" name="guardian_phone" placeholder="Phone Number" required>
+                        <input type="email" class="w-full p-3 rounded-md" id="guardian_email" name="guardian_email" placeholder="Email Address" required>
+                    </div>
+                </div>
+
+                <!-- Additional Details -->
+                <div class="mb-8">
+                    <div class="section-header">
+                        <h3 class="text-xl font-semibold">Additional Information</h3>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <input type="text" class="w-full p-3 rounded-md" id="suspect_name" name="suspect_name" placeholder="Suspect Name (if known)">
+                        <input type="text" class="w-full p-3 rounded-md" id="vehicle_info" name="vehicle_info" placeholder="Vehicle Information">
+                        
+                        <textarea class="w-full p-3 rounded-md col-span-2" id="suspect_description" name="suspect_description" placeholder="Description of Suspect" rows="3"></textarea>
+                        
+                        <div class="col-span-2 flex items-center">
+                            <input type="checkbox" id="authorities_contacted" name="authorities_contacted" class="mr-2">
+                            <label for="authorities_contacted" class="text-gray-700">Authorities Contacted?</label>
+                        </div>
+                        
+                        <textarea class="w-full p-3 rounded-md col-span-2" id="search_efforts" name="search_efforts" placeholder="Search Efforts (e.g., volunteers, tracking)" rows="4"></textarea>
+                        
+                        <select class="w-full p-3 rounded-md" id="status" name="status" required>
+                            <option value="active">Active Case</option>
+                            <option value="closed">Closed Case</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-full hover:bg-blue-700 transition duration-300 text-lg font-bold">
+                        Submit Case Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

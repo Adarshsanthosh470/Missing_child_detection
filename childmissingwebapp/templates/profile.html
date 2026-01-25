@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-header {
+            background: linear-gradient(to right, #4a90e2, #63b3ed);
+            padding: 25px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+        }
+
+        .profile-content {
+            padding: 30px;
+        }
+
+        .info-group {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            transition: all 0.3s ease;
+        }
+
+        .info-group:hover {
+            transform: translateX(10px);
+            border-bottom-color: #4a90e2;
+        }
+
+        .info-group:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+        }
+
+        .info-row .info-label {
+            width: 33%;
+            margin-bottom: 0;
+        }
+
+        .info-row .info-value {
+            width: 67%;
+        }
+
+        @media (max-width: 480px) {
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .info-row .info-label,
+            .info-row .info-value {
+                width: 100%;
+            }
+
+            .info-row .info-label {
+                margin-bottom: 5px;
+            }
+        }
+
+        /* Styling for the Update button */
+        .update-btn-wrapper {
+            padding: 20px;
+            background: #f9f9f9;
+            text-align: center;
+            border-top: 1px solid #e8e8e8;
+        }
+
+        .update-btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            background-color: #4a90e2;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .update-btn:hover {
+            background-color: #357ab7;
+        }
+
+        .update-btn:active {
+            background-color: #2d6592;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <div class="profile-header">
+            <h1>User Profile</h1>
+        </div>
+        <div class="profile-content">
+            <div class="info-group">
+                <div class="info-row">
+                    <div class="info-label">Name</div>
+                    <div class="info-value">{{ data.name }}</div>
+                </div>
+            </div>
+            <div class="info-group">
+                <div class="info-row">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ data.email }}</div>
+                </div>
+            </div>
+            <div class="info-group">
+                <div class="info-row">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">{{ data.phone }}</div>
+                </div>
+            </div>
+            <div class="info-group">
+                <div class="info-row">
+                    <div class="info-label">Password</div>
+                    <div class="info-value">{{ data.password }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Button Section -->
+        <div class="update-btn-wrapper">
+            <a href="/update/" class="update-btn">Update Profile</a>
+        </div>
+    </div>
+</body>
+</html>

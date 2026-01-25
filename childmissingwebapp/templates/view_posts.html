@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Social Media Feed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+
+<!-- Header -->
+<header class="bg-white shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto flex justify-between items-center py-4 px-4">
+        <h1 class="text-2xl font-bold text-blue-600">Social Feed</h1>
+
+        <!-- Add Post Button -->
+        <a href="{% url 'upload_post' %}" 
+           class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            + Add Post
+        </a>
+    </div>
+</header>
+
+
+<!-- Filter Bar -->
+<div class="max-w-6xl mx-auto mt-6 px-4">
+    <div class="bg-white p-4 rounded-lg shadow flex flex-wrap gap-4">
+
+        <form method="GET" class="flex flex-wrap gap-4 w-full">
+
+            <!-- Sort Filter -->
+            <select name="sort" class="border p-2 rounded-lg w-48">
+                <option value="">Sort By</option>
+                <option value="new">Newest First</option>
+                <option value="old">Oldest First</option>
+            </select>
+
+            <!-- User Name Filter -->
+            <input type="text" name="user" 
+                   placeholder="Filter by Username"
+                   class="border p-2 rounded-lg w-60">
+
+            <!-- Images Only -->
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="imgonly">
+                <span>Images Only</span>
+            </label>
+
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Apply Filters
+            </button>
+        </form>
+
+    </div>
+</div>
+
+
+
+<!-- Feed -->
+<div class="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    {% for post in posts %}
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition">
+
+        <!-- Image -->
+        <img src="{{ post.image.url }}" class="w-full h-72 object-cover">
+
+        <!-- Content -->
+        <div class="p-5">
+            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                    {{ post.user_name|slice:":1" }}
+                </span>
+                {{ post.user_name }}
+            </h2>
+
+            <p class="text-gray-700 mt-2">
+                {{ post.caption }}
+            </p>
+
+            <p class="text-gray-400 text-sm mt-3">
+                Posted on {{ post.created_at|date:"M d, Y · h:i A" }}
+            </p>
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+
+
+<!-- Floating Add Button (Mobile) -->
+<a href="{% url 'upload_post' %}"
+   class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 flex items-center justify-center rounded-full shadow-xl text-3xl hover:bg-blue-700 transition lg:hidden">
+    +
+</a>
+
+</body>
+</html>

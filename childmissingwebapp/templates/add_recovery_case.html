@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Recovery Case</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4a6ea9;
+        }
+        form {
+            display: grid;
+            grid-gap: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .select-case-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 15px;
+        }
+        .case-select {
+            display: none;
+        }
+        textarea {
+            min-height: 100px;
+        }
+        button {
+            background-color: #4a6ea9;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #3a5a89;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Child Recovery Case</h1>
+        
+        <form action="{% url 'add_recovery_case' %}" method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="case_type">Select Case Type:</label>
+                <select id="case_type" name="case_type" onchange="toggleCaseSelect()" required>
+                    <option value="">-- Select Case Type --</option>
+                    <option value="childloc">User Reported Case</option>
+                    <option value="newcase">Admin Added Case</option>
+                </select>
+            </div>
+            
+            <div class="select-case-container">
+                <div id="childloc_select" class="case-select">
+                    <label for="childloc_id">Select User Reported Case:</label>
+                    <select id="childloc_id" name="case_id">
+                        <option value="">-- Select Case --</option>
+                        {% for case in child_locator_cases %}
+                        <option value="{{ case.id }}">{{ case.full_name }} ({{ case.last_seen_date }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div id="newcase_select" class="case-select">
+                    <label for="newcase_id">Select Admin Added Case:</label>
+                    <select id="newcase_id" name="case_id">
+                        <option value="">-- Select Case --</option>
+                        {% for case in new_cases %}
+                        <option value="{{ case.id }}">{{ case.childname }} ({{ case.last_seen_date }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="date_disappearance">Date of Disappearance:</label>
+                <input type="date" id="date_disappearance" name="date_disappearance" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description of Disappearance:</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="suspected_causes">Suspected Causes:</label>
+                <input type="text" id="suspected_causes" name="suspected_causes">
+            </div>
+            
+            <div class="form-group">
+                <label for="who_involved">Who Was Involved:</label>
+                <input type="text" id="who_involved" name="who_involved">
+            </div>
+            
+            <div class="form-group">
+                <label for="tools_methods">Tools/Methods Used in Recovery:</label>
+                <input type="text" id="tools_methods" name="tools_methods">
+            </div>
+            
+            <div class="form-group">
+                <label for="found_location">Location Where Child Was Found:</label>
+                <textarea id="found_location" name="found_location" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="who_found">Who Found the Child:</label>
+                <input type="text" id="who_found" name="who_found">
+            </div>
+            
+            <div class="form-group">
+                <label for="recovery_wellbeing">Child's Wellbeing After Recovery:</label>
+                <textarea id="recovery_wellbeing" name="recovery_wellbeing"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="legal_actions">Legal Actions Taken:</label>
+                <textarea id="legal_actions" name="legal_actions"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="submitted_by">Submitted By:</label>
+                <input type="text" id="submitted_by" name="submitted_by" required>
+            </div>
+            
+            <button type="submit">Submit Recovery Case</button>
+        </form>
+    </div>
+    
+    <script>
+        function toggleCaseSelect() {
+            const caseType = document.getElementById('case_type').value;
+            const childlocSelect = document.getElementById('childloc_select');
+            const newcaseSelect = document.getElementById('newcase_select');
+            
+            // Hide both selects first
+            childlocSelect.style.display = 'none';
+            newcaseSelect.style.display = 'none';
+            
+            // Clear values
+            document.getElementById('childloc_id').name = '';
+            document.getElementById('newcase_id').name = '';
+            
+            // Show appropriate select based on choice
+            if (caseType === 'childloc') {
+                childlocSelect.style.display = 'block';
+                document.getElementById('childloc_id').name = 'case_id';
+            } else if (caseType === 'newcase') {
+                newcaseSelect.style.display = 'block';
+                document.getElementById('newcase_id').name = 'case_id';
+            }
+        }
+    </script>
+</body>
+</html>

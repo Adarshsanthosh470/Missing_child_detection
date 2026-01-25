@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Comparison Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        .file-input {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-input:hover {
+            border-color: #aaa;
+        }
+        .file-input input {
+            display: none;
+        }
+        .preview-area {
+            display: none;
+            max-width: 100%;
+            margin-top: 20px;
+        }
+        .preview-area img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Face Comparison Tool</h1>
+        
+        <div class="error" id="error-message"></div>
+        
+        <form action="" method="post" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="uploaded_image">Upload an image to compare:</label>
+                <div class="file-input" id="file-drop-area">
+                    <p>Drag and drop an image here, or click to select a file</p>
+                    <input type="file" name="uploaded_image" id="uploaded_image" accept="image/*" required>
+                </div>
+                <div class="preview-area" id="image-preview">
+                    <img id="preview-img" src="#" alt="Preview">
+                </div>
+            </div>
+            <button type="submit">Compare Faces</button>
+        </form>
+    </div>
+
+    <script>
+        // File input and preview functionality
+        const fileInput = document.getElementById('uploaded_image');
+        const fileDropArea = document.getElementById('file-drop-area');
+        const imagePreview = document.getElementById('image-preview');
+        const previewImg = document.getElementById('preview-img');
+        const errorMessage = document.getElementById('error-message');
+
+        fileInput.addEventListener('change', function() {
+            displayImagePreview(this);
+        });
+
+        fileDropArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            fileDropArea.style.borderColor = '#45a049';
+            fileDropArea.style.backgroundColor = '#f0f9f0';
+        }
+
+        function unhighlight() {
+            fileDropArea.style.borderColor = '#ccc';
+            fileDropArea.style.backgroundColor = '';
+        }
+
+        fileDropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                fileInput.files = files;
+                displayImagePreview(fileInput);
+            }
+        }
+
+        function displayImagePreview(input) {
+            errorMessage.style.display = 'none';
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Check if file is an image
+                if (!file.type.match('image.*')) {
+                    errorMessage.textContent = 'Please select an image file (JPEG, PNG, etc.)';
+                    errorMessage.style.display = 'block';
+                    imagePreview.style.display = 'none';
+                    return;
+                }
+                
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    errorMessage.textContent = 'File size exceeds 5MB. Please select a smaller image.';
+                    errorMessage.style.display = 'block';
+                    imagePreview.style.display = 'none';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    fileDropArea.style.display = 'none';
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>

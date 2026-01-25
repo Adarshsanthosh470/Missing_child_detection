@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Child Face Detection and Matching</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+        .location-status {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        .loading {
+            color: #FFA500;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #F44336;
+        }
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #09f;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Child Face Detection</h1>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="image">Upload Image:</label>
+                <input type="file" id="image" name="image" accept="image/*" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Current Location:</label>
+                <input type="text" id="location" name="location" required placeholder="e.g. 123 Main St, City, State">
+                <div id="location-status" class="location-status">
+                    <span class="spinner"></span>
+                    <span id="status-text" class="loading">Fetching your location...</span>
+                </div>
+            </div>
+            
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+            
+            <button type="submit">Detect and Match Face</button>
+        </form>
+        
+        <p class="note">
+            This system will compare the uploaded image against our database of missing children.
+            If a match is found, an alert will be sent to the appropriate contact.
+        </p>
+    </div>
+
+    <script>
+        // Function to get user's current location
+        function getLocation() {
+            const locationInput = document.getElementById('location');
+            const locationStatus = document.getElementById('location-status');
+            const statusText = document.getElementById('status-text');
+            const latitudeField = document.getElementById('latitude');
+            const longitudeField = document.getElementById('longitude');
+            
+            // Check if geolocation is available
+            if (navigator.geolocation) {
+                // Get the current position
+                navigator.geolocation.getCurrentPosition(
+                    // Success callback
+                    function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        
+                        // Store coordinates in hidden fields
+                        latitudeField.value = latitude;
+                        longitudeField.value = longitude;
+                        
+                        // Use reverse geocoding to get the address
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                // Extract address from response
+                                if (data && data.display_name) {
+                                    locationInput.value = data.display_name;
+                                    statusText.textContent = "Location detected successfully";
+                                    statusText.className = "success";
+                                    locationStatus.querySelector('.spinner').style.display = 'none';
+                                } else {
+                                    // If we have coordinates but no address, show coordinates
+                                    locationInput.value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                                    statusText.textContent = "Coordinates detected (address not available)";
+                                    statusText.className = "success";
+                                    locationStatus.querySelector('.spinner').style.display = 'none';
+                                }
+                            })
+                            .catch(error => {
+                                // If reverse geocoding fails, just use coordinates
+                                locationInput.value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                                statusText.textContent = "Coordinates detected (address not available)";
+                                statusText.className = "success";
+                                locationStatus.querySelector('.spinner').style.display = 'none';
+                            });
+                    },
+                    // Error callback
+                    function(error) {
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                statusText.textContent = "Location access denied. Please enter location manually.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                statusText.textContent = "Location information unavailable. Please enter location manually.";
+                                break;
+                            case error.TIMEOUT:
+                                statusText.textContent = "Location request timed out. Please enter location manually.";
+                                break;
+                            default:
+                                statusText.textContent = "An unknown error occurred. Please enter location manually.";
+                        }
+                        statusText.className = "error";
+                        locationStatus.querySelector('.spinner').style.display = 'none';
+                    }
+                );
+            } else {
+                // Geolocation not supported
+                statusText.textContent = "Geolocation is not supported by this browser. Please enter location manually.";
+                statusText.className = "error";
+                locationStatus.querySelector('.spinner').style.display = 'none';
+            }
+        }
+        
+        // Initialize location fetching when the page loads
+        document.addEventListener('DOMContentLoaded', getLocation);
+        
+        // Allow manual override by typing
+        document.getElementById('location').addEventListener('input', function() {
+            const statusText = document.getElementById('status-text');
+            if (this.value && this.value.trim() !== '') {
+                statusText.textContent = "Using manually entered location";
+                statusText.className = "success";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missing Child Cases</title>
+</head>
+<style>
+    /* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+header nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
+    padding: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #333;
+    color: white;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+</style>
+<body>
+
+    <header>
+        <h1>Missing Child Cases List</h1>
+        <nav>
+            <ul>
+                <li><a href="/home1/">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>List of All Cases</h2>
+
+            {% if case %}
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Child Name</th>
+                            <th>Image</th>
+                            <th>Gender</th>
+                            <th>Last Seen Date</th>
+                            <th>Location</th>
+                            <th>Guardian</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for case_item in case %}
+                            <tr>
+                                <td>{{ case_item.childname }}</td>
+                                <td>
+                                    {% if case_item.photo %}
+                                        <img src="{{ case_item.photo.url }}" alt="{{ case_item.childname }}" width="100" height="100">
+                                    {% else %}
+                                        No Image Available
+                                    {% endif %}
+                                </td>
+                                <td>{{ case_item.gender }}</td>
+                                <td>{{ case_item.last_seen_date }}</td>
+                                <td>{{ case_item.last_seen_location }}</td>
+                                <td>{{ case_item.guardian_name }}</td>
+                                <td>{{ case_item.status }}</td>
+                                
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No cases available.</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Child Missing Cases. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

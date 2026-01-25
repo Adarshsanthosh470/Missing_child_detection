@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Comparison Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .error-message {
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 5px solid #d32f2f;
+        }
+        .results-summary {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4caf50;
+        }
+        .match-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .match-image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .match-image {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .match-details {
+            width: 100%;
+        }
+        .match-confidence {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4caf50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .match-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 16px;
+        }
+        .back-button {
+            display: block;
+            width: 200px;
+            margin: 30px auto 0;
+            padding: 12px 20px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #0d8bf2;
+        }
+        .no-matches {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Face Comparison Results</h1>
+        
+        {% if error %}
+        <div class="error-message">
+            <p>{{ error }}</p>
+        </div>
+        {% else %}
+            {% if total_matches > 0 %}
+            <div class="results-summary">
+                <p>Displaying the best possible match from our database</p>
+            </div>
+            
+            <div class="match-card">
+                {% with best_match=matches.0 %}
+                <div class="match-confidence">{{ best_match.confidence }}% Match</div>
+                
+                <div class="match-image-container">
+                    {% if best_match.model_type == 'NewCase' %}
+                        <img src="{{ best_match.case.photo.url }}" alt="{{ best_match.case.childname }}" class="match-image">
+                    {% else %}
+                        <img src="{{ best_match.case.image.url }}" alt="{{ best_match.case.full_name }}" class="match-image">
+                    {% endif %}
+                </div>
+                
+                <div class="match-details">
+                    {% if best_match.model_type == 'NewCase' %}
+                        <div class="match-info">
+                            <div class="info-item">
+                                <span class="info-label">Name</span>
+                                <span class="info-value">{{ best_match.case.childname }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Age</span>
+                                <span class="info-value">
+                                    {% now "Y" as current_year %}
+                                    {% with birth_year=best_match.case.dob|date:"Y" %}
+                                    {% with age=current_year|add:"-"|add:birth_year %}
+                                    {{ age }} years
+                                    {% endwith %}
+                                    {% endwith %}
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Gender</span>
+                                <span class="info-value">{{ best_match.case.gender|title }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Last Seen</span>
+                                <span class="info-value">{{ best_match.case.last_seen_date|date:"F j, Y" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Location</span>
+                                <span class="info-value">{{ best_match.case.last_seen_location }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="info-value">{{ best_match.case.status|title }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Height</span>
+                                <span class="info-value">{{ best_match.case.height }} cm</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Weight</span>
+                                <span class="info-value">{{ best_match.case.weight }} kg</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="match-info">
+                            <div class="info-item">
+                                <span class="info-label">Name</span>
+                                <span class="info-value">{{ best_match.case.full_name }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Age</span>
+                                <span class="info-value">
+                                    {% now "Y" as current_year %}
+                                    {% with birth_year=best_match.case.date_of_birth|date:"Y" %}
+                                    {% with age=current_year|add:"-"|add:birth_year %}
+                                    {{ age }} years
+                                    {% endwith %}
+                                    {% endwith %}
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Gender</span>
+                                <span class="info-value">{{ best_match.case.gender|title }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Last Seen</span>
+                                <span class="info-value">{{ best_match.case.last_seen_date|date:"F j, Y" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Location</span>
+                                <span class="info-value">{{ best_match.case.last_seen_location }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Guardian</span>
+                                <span class="info-value">{{ best_match.case.guardian_name }}</span>
+                            </div>
+                            {% if best_match.case.height_cm %}
+                            <div class="info-item">
+                                <span class="info-label">Height</span>
+                                <span class="info-value">{{ best_match.case.height_cm }} cm</span>
+                            </div>
+                            {% endif %}
+                            {% if best_match.case.weight_kg %}
+                            <div class="info-item">
+                                <span class="info-label">Weight</span>
+                                <span class="info-value">{{ best_match.case.weight_kg }} kg</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endwith %}
+            </div>
+            {% else %}
+            <div class="no-matches">
+                <h2>No matches found</h2>
+                <p>The uploaded image did not match any records in our database.</p>
+            </div>
+            {% endif %}
+        {% endif %}
+        
+        <a href="{% url 'face_comparison_view' %}" class="back-button">Upload Another Image</a>
+    </div>
+</body>
+</html>

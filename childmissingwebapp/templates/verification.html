@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Locator Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-blue-50 min-h-screen">
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold text-center text-blue-800 mb-8">Child Locator Verification</h1>
+        <p class="text-center text-gray-600 mb-8">Below is a list of child locator reports awaiting verification. Please review the details.</p>
+
+        <!-- Table for displaying the child locator reports -->
+        <div class="overflow-x-auto shadow-md border-b border-blue-300 rounded-lg">
+            <table class="min-w-full text-left text-sm text-gray-500">
+                <thead class="bg-blue-600 text-white">
+                    <tr>
+                        <th class="px-6 py-4">Full Name</th>
+                        <th class="px-6 py-4">Date of Birth</th>
+                        <th class="px-6 py-4">Last Seen Location</th>
+                        <th class="px-6 py-4">Last Seen Date</th>
+                        <th class="px-6 py-4">Guardian Name</th>
+                        <th class="px-6 py-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in ver %}
+                    <tr class="border-t border-gray-200">
+                        <td class="px-6 py-4">{{ report.full_name }}</td>
+                        <td class="px-6 py-4">{{ report.date_of_birth }}</td>
+                        <td class="px-6 py-4">{{ report.last_seen_location }}</td>
+                        <td class="px-6 py-4">{{ report.last_seen_date }}</td>
+                        <td class="px-6 py-4">{{ report.guardian_name }}</td>
+                        <td class="px-6 py-4">
+                            <!-- Accept button to mark as accepted -->
+                            <form method="POST" action="{% url 'accept_case' report.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">
+                                    Accept
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">No reports found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

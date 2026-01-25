@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Face Matching Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .success-message {
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .details p {
+            margin: 5px 0;
+        }
+        .confidence {
+            font-weight: bold;
+        }
+        .map-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #337ab7;
+            text-decoration: none;
+        }
+        .map-link:hover {
+            text-decoration: underline;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #337ab7;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Face Matching Result</h1>
+        
+        <div class="success-message">
+            <h2>Match Found!</h2>
+            <p>A potential match has been identified for child: <strong>{{ child_name }}</strong></p>
+            <p>Confidence level: <span class="confidence">{{ confidence|floatformat:2 }}</span></p>
+        </div>
+        
+        <div class="details">
+            <h3>Alert Details:</h3>
+            <p>Location: {{ location }}</p>
+            <p>
+                <a href="{{ map_link }}" target="_blank" class="map-link">
+                    View on Google Maps
+                </a>
+            </p>
+            <p>Email notification sent to: {{ recipient }}</p>
+        </div>
+        
+        <a href="{% url 'detect_face' %}" class="back-link">Back to Detection</a>
+    </div>
+</body>
+</html>
