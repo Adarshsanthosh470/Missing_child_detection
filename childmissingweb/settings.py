@@ -23,9 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-opcy2###6#^7(br=(@g2m(^&&)h9&+q+g*82ar!5v!ikz#zn&a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://trackwiise.netlify.app/']
+
+
 
 
 # Application definition
@@ -127,8 +129,9 @@ EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER= 'nefsal003@gmail.com'
-EMAIL_HOST_PASSWORD= 'htxalvzrrkxupspv'
+EMAIL_HOST_USER= 'adarshsanthosh090@gmail.com'
+EMAIL_HOST_PASSWORD= 'cruf kxsd opzv ybnn'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
