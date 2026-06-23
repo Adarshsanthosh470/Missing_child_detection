@@ -25,9 +25,12 @@ SECRET_KEY = 'django-insecure-opcy2###6#^7(br=(@g2m(^&&)h9&+q+g*82ar!5v!ikz#zn&a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://trackwiise.netlify.app/']
-
-
+ALLOWED_HOSTS = [
+    'trackwiise.netlify.app', 
+    '127.0.0.1', 
+    'localhost',
+    'your-backend-domain.onrender.com'  # <-- REPLACE THIS with your actual Django backend deployment URL
+]
 
 
 # Application definition
@@ -39,10 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',  # <-- FIXED: Added this missing registration
     'childmissingwebapp',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Top priority for CORS handling
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,6 +58,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'childmissingweb.urls'
+
+CORS_ALLOWED_ORIGINS = [
+    "https://trackwiise.netlify.app",
+]
 
 TEMPLATES = [
     {
