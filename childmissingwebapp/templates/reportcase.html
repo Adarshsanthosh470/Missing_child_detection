@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 
-<body x-data="{ step: {{ step }} }" class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen flex items-center justify-center p-4">
+<body x-data="{ step: {{ step|default:1 }} }" class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen flex items-center justify-center p-4">
 
     <div class="bg-white shadow-2xl rounded-2xl w-full max-w-4xl p-8 border-t-8 border-blue-600">
         <div class="text-center mb-8">
@@ -16,38 +16,49 @@
             <p class="text-gray-500">Comprehensive Child Identification and Search Protocol</p>
         </div>
 
-        <div class="progress-bar flex justify-between mb-8">
+        <!-- Progress Bar: Improved logic to show actual progress -->
+        <div class="mb-8">
+            <div class="flex justify-between mb-2">
+                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                    Step {{ step|default:1 }} of 4
+                </span>
+                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                    {% if step == 1 %}25%{% elif step == 2 %}50%{% elif step == 3 %}75%{% else %}100%{% endif %}
+                </span>
+            </div>
             <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full" :style="`width: ${(step/4)*100}%`"></div>
+                <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" :style="`width: ${(step/4)*100}%`"></div>
             </div>
         </div>
 
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            <input type="hidden" name="step" value="{{ step }}">
+            <!-- Crucial: Hidden input to tell the backend which step we ARE on -->
+            <input type="hidden" name="current_step" value="{{ step|default:1 }}">
             
             <!-- Step 1: Basic Information -->
-            {% if step == 1 %}
+            {% if step == 1 or not step %}
             <div class="grid md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-blue-800 font-semibold mb-2">Child's Full Name</label>
-                    <input type="text" name="full_name" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 transition">
+                    <input type="text" name="full_name" value="{{ request.POST.full_name }}" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 transition">
                 </div>
                 <div>
                     <label class="block text-blue-800 font-semibold mb-2">Date of Birth</label>
-                    <input type="date" name="date_of_birth" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 transition">
+                    <input type="date" name="date_of_birth" value="{{ request.POST.date_of_birth }}" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 transition">
                 </div>
                 <div>
                     <label class="block text-blue-800 font-semibold mb-2">Gender</label>
                     <select name="gender" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 transition">
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
+                        <option value="male" {% if request.POST.gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if request.POST.gender == 'female' %}selected{% endif %}>Female</option>
+                        <option value="other" {% if request.POST.gender == 'other' %}selected{% endif %}>Other</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-blue-800 font-semibold mb-2">Upload Image</label>
                     <input type="file" name="image" accept="image/*" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 transition">
+                    {% if request.POST.image %}<p class="text-xs text-gray-500 mt-1">Image already uploaded</p>{% endif %}
                 </div>                
             </div>
             {% endif %}
@@ -58,26 +69,26 @@
                 <div class="grid md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-blue-800 font-semibold mb-2">Height (cm)</label>
-                        <input type="number" name="height_cm" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
+                        <input type="number" name="height_cm" value="{{ request.POST.height_cm }}" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-blue-800 font-semibold mb-2">Weight (kg)</label>
-                        <input type="number" name="weight_kg" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
+                        <input type="number" name="weight_kg" value="{{ request.POST.weight_kg }}" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-blue-800 font-semibold mb-2">Hair Color</label>
                         <select name="hair_color" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
-                            <option value="black">Black</option>
-                            <option value="brown">Brown</option>
-                            <option value="blonde">Blonde</option>
-                            <option value="red">Red</option>
-                            <option value="grey">Grey</option>
+                            <option value="black" {% if request.POST.hair_color == 'black' %}selected{% endif %}>Black</option>
+                            <option value="brown" {% if request.POST.hair_color == 'brown' %}selected{% endif %}>Brown</option>
+                            <option value="blonde" {% if request.POST.hair_color == 'blonde' %}selected{% endif %}>Blonde</option>
+                            <option value="red" {% if request.POST.hair_color == 'red' %}selected{% endif %}>Red</option>
+                            <option value="grey" {% if request.POST.hair_color == 'grey' %}selected{% endif %}>Grey</option>
                         </select>
                     </div>
                 </div>
                 <div>
                     <label class="block text-blue-800 font-semibold mb-2">Distinctive Marks/Characteristics</label>
-                    <textarea name="distinctive_marks" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg" rows="4" placeholder="Describe unique identifying features"></textarea>
+                    <textarea name="distinctive_marks" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg" rows="4" placeholder="Describe unique identifying features">{{ request.POST.distinctive_marks }}</textarea>
                 </div>
             </div>
             {% endif %}
@@ -88,16 +99,16 @@
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-blue-800 font-semibold mb-2">Last Seen Location</label>
-                        <input type="text" name="last_seen_location" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
+                        <input type="text" name="last_seen_location" value="{{ request.POST.last_seen_location }}" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-blue-800 font-semibold mb-2">Last Seen Date</label>
-                        <input type="date" name="last_seen_date" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
+                        <input type="date" name="last_seen_date" value="{{ request.POST.last_seen_date }}" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
                     </div>
                 </div>
                 <div>
                     <label class="block text-blue-800 font-semibold mb-2">Last Known Clothing</label>
-                    <textarea name="last_known_clothing" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg" rows="3" placeholder="Describe clothing details"></textarea>
+                    <textarea name="last_known_clothing" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg" rows="3" placeholder="Describe clothing details">{{ request.POST.last_known_clothing }}</textarea>
                 </div>
             </div>
             {% endif %}
@@ -108,19 +119,19 @@
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-blue-800 font-semibold mb-2">Guardian's Name</label>
-                        <input type="text" name="guardian_name" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
+                        <input type="text" name="guardian_name" value="{{ request.POST.guardian_name }}" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-blue-800 font-semibold mb-2">Contact Number</label>
-                        <input type="tel" name="contact_number" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
+                        <input type="tel" name="contact_number" value="{{ request.POST.contact_number }}" required class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
                     </div>
                 </div>
                 <div>
                     <label class="block text-blue-800 font-semibold mb-2">Email</label>
-                    <input type="email" name="email" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
+                    <input type="email" name="email" value="{{ request.POST.email }}" class="w-full px-4 py-3 border-2 border-blue-200 rounded-lg">
                 </div>                
                 <div class="flex items-center">
-                    <input type="checkbox" name="information_confirmed" required class="mr-2 text-blue-600 focus:ring-blue-400">
+                    <input type="checkbox" name="information_confirmed" required class="mr-2 h-5 w-5 text-blue-600 focus:ring-blue-400">
                     <label class="text-gray-700">I confirm the information provided is accurate</label>
                 </div>
             </div>
@@ -128,17 +139,19 @@
             
             <div class="flex justify-between mt-6">
                 {% if step > 1 %}
-                <button type="submit" name="step" value="{{ step|add:-1 }}" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition">
+                <button type="submit" name="next_step" value="{{ step|add:-1 }}" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition">
                     Previous
                 </button>
+                {% else %}
+                <div></div> <!-- Spacer -->
                 {% endif %}
                 
                 {% if step < 4 %}
-                <button type="submit" name="step" value="{{ step|add:1 }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                <button type="submit" name="next_step" value="{{ step|add:1 }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
                     Next
                 </button>
                 {% else %}
-                <button type="submit" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition">
+                <button type="submit" name="submit_final" value="true" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition">
                     Submit Case
                 </button>
                 {% endif %}

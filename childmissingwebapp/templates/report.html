@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-5">
+        <h1 class="text-3xl font-bold text-center mb-5">Reports & Analytics</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div class="bg-white shadow-md rounded-lg p-5">
+                <h2 class="text-xl font-semibold">Missing Children</h2>
+                <p class="text-4xl font-bold">{{ missing_count }}</p>
+            </div>
+            <div class="bg-white shadow-md rounded-lg p-5">
+                <h2 class="text-xl font-semibold">Detected Children</h2>
+                <p class="text-4xl font-bold">{{ detected_count }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-5">
+            <h2 class="text-2xl font-semibold mb-4">Case Details</h2>
+            <div id="case-list">
+                {% for case in cases %}
+                <div class="border-b mb-4 pb-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-bold">{{ case.childname }}</p>
+                            <p class="text-sm text-gray-600">Case ID: {{ case.id }}</p>
+                        </div>
+                        <button class="text-blue-500 view-details-btn" data-case-id="{{ case.id }}">View</button>
+                    </div>
+                    <div id="details-{{ case.id }}" class="hidden mt-4">
+                        <p><strong>Date Reported:</strong> {{ case.last_seen_date }}</p>
+                        <p><strong>Status:</strong> {{ case.status }}</p>
+                        <p><strong>Gender:</strong> {{ case.gender }}</p>
+                        <p><strong>Height:</strong> {{ case.height }} cm</p>
+                        <p><strong>Weight:</strong> {{ case.weight }} kg</p>
+                        <p><strong>Eye Color:</strong> {{ case.eye_color }}</p>
+                        <p><strong>Hair Color:</strong> {{ case.hair_color }}</p>
+                        <p><strong>Last Seen Location:</strong> {{ case.last_seen_location }}</p>
+                        <p><strong>Guardian Name:</strong> {{ case.guardian_name }}</p>
+                        <p><strong>Guardian Phone:</strong> {{ case.guardian_phone }}</p>
+                        <p><strong>Guardian Email:</strong> {{ case.guardian_email }}</p>
+                        {% if case.childrecoverycase and case.childrecoverycase.childloc %}
+                        <div class="mt-4">
+                            <h3 class="text-xl font-semibold">Recovery Details</h3>
+                            <div class="grid grid-cols-2 gap-4 mt-2">
+                                <div>
+                                    <p><strong>Missing Photo:</strong></p>
+                                    <img src="{{ case.photo.url }}" alt="Missing Photo" class="w-full">
+                                </div>
+                                <div>
+                                    <p><strong>Found Photo:</strong></p>
+                                    <img src="{{ case.childrecoverycase.childloc.image.url }}" alt="Found Photo" class="w-full">
+                                </div>
+                            </div>
+                            <p><strong>Missing Location:</strong> {{ case.last_seen_location }}</p>
+                            <p><strong>Detected Location:</strong> {{ case.childrecoverycase.found_location }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.view-details-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const caseId = button.dataset.caseId;
+                const details = document.getElementById(`details-${caseId}`);
+                details.classList.toggle('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
