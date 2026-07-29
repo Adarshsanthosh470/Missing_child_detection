@@ -29,7 +29,8 @@ ALLOWED_HOSTS = [
     'trackwiise.netlify.app', 
     '127.0.0.1', 
     'localhost',
-    'your-backend-domain.onrender.com'  # <-- REPLACE THIS with your actual Django backend deployment URL
+    'yourusername.pythonanywhere.com',  # <-- REPLACE 'yourusername' with your actual PythonAnywhere username
+    'your-backend-domain.onrender.com'
 ]
 
 
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',  # <-- FIXED: Added this missing registration
+    'corsheaders',
     'childmissingwebapp',
 ]
 
@@ -128,18 +129,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')]
-STATIC_ROOT=os.path.join(BASE_DIR,'asset')
-MEDIA_ROOT=os.path.join(BASE_DIR,'media')
-MEDIA_URL='/media/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'childmissingwebapp', 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 
-EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER= 'adarshsanthosh090@gmail.com'
-EMAIL_HOST_PASSWORD= 'cruf kxsd opzv ybnn'
+EMAIL_HOST_USER = 'adarshsanthosh090@gmail.com'
+EMAIL_HOST_PASSWORD = 'cruf kxsd opzv ybnn'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Default primary key field type

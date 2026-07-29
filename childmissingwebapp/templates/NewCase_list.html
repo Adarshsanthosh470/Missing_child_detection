@@ -3,98 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missing Children Cases</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Case Management Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            text-align: center;
-            height: 100%;
-        }
-        .card-body img {
-            max-height: 200px;
-            width: auto;
-            object-fit: cover;
-        }
+        body { background-color: #f3f4f6; font-family: 'Inter', sans-serif; }
+        .case-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb; }
     </style>
 </head>
-<body>
-    <div class="container my-5">
-        <h2 class="text-center mb-4">Missing Children Cases</h2>
+<body class="p-8">
+
+    <div class="max-w-7xl mx-auto space-y-10">
         
-        <h3 class="text-center">New Missing Cases</h3>
-        <div class="row">
-            {% for case in new_cases %}
-            <div class="col-md-4 col-sm-6 mb-4 d-flex align-items-stretch">
-                <div class="card w-100">
-                    <div class="card-body">
-                        <div class="text-center">
-                            {% if case.photo %}
-                                <img src="{{ case.photo.url }}" alt="Photo of {{ case.childname }}" class="img-fluid">
-                            {% else %}
-                                <img src="" alt="No Photo Available" class="img-fluid">
-                            {% endif %}
-                        </div>
-                        <h5 class="card-title mt-3">{{ case.childname }}</h5>
-                        <p class="card-text">
-                            <strong>Date of Birth:</strong> {{ case.dob }}<br>
-                            <strong>Gender:</strong> {{ case.get_gender_display }}<br>
-                            <strong>Last Seen Date:</strong> {{ case.last_seen_date }}<br>
-                            <strong>Last Seen Location:</strong> {{ case.last_seen_location }}<br>
-                            <strong>Guardian Name:</strong> {{ case.guardian_name }}<br>
-                            <strong>Status:</strong> {{ case.get_status_display }}<br>
-                        </p>
-                        <div class="text-center">
-                            <button class="btn btn-primary" onclick="window.location.href='#'">View Details</button>
-                            <a href="{% url 'deletecase' uid=case.id model_type='newcase' %}" class="btn btn-danger mt-2" onclick="return confirm('Are you sure you want to delete this case?')">Delete</a>
-                        </div>
-                    </div>
-                </div>
+        <div class="bg-white shadow-md rounded-lg p-5">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">Official Missing Child Cases</h2>
+                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">Admin Managed</span>
             </div>
-            {% empty %}
-            <p class="text-center w-100">No missing children cases found in New Cases.</p>
-            {% endfor %}
+            
+            <table class="w-full text-sm text-left">
+                <thead>
+                    <tr class="bg-gray-100 border-b">
+                        <th class="p-3 font-semibold text-gray-600">Case ID</th>
+                        <th class="p-3 font-semibold text-gray-600">Child Name</th>
+                        <th class="p-3 font-semibold text-gray-600">Image</th>
+                        <th class="p-3 font-semibold text-gray-600">Last Seen Location</th>
+                        <th class="p-3 font-semibold text-gray-600">Date Reported</th>
+                        <th class="p-3 font-semibold text-gray-600">Status</th>
+                        <th class="p-3 font-semibold text-gray-600">Priority</th>
+                        <th class="p-3 font-semibold text-gray-600 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for case_item in new_cases %}
+                    <tr class="border-b hover:bg-gray-50 transition-colors">
+                        <td class="p-3 font-medium">#{{ case_item.id }}</td>
+                        <td class="p-3 font-bold text-blue-900">{{ case_item.childname }}</td>
+                        <td class="p-3">
+                            {% if case_item.photo %}
+                                <img src="{{ case_item.photo.url }}" alt="{{ case_item.childname }}" class="case-img">
+                            {% else %}
+                                <div class="w-20 h-20 bg-gray-200 flex items-center justify-center rounded-lg text-[10px] text-gray-500">No Image</div>
+                            {% endif %}
+                        </td>
+                        <td class="p-3 text-gray-700">{{ case_item.last_seen_location }}</td>
+                        <td class="p-3 text-gray-500">{{ case_item.last_seen_date }}</td>
+                        <td class="p-3">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold 
+                                {% if case_item.status == 'active' %}bg-green-100 text-green-600
+                                {% elif case_item.status == 'closed' %}bg-red-100 text-red-600
+                                {% else %}bg-yellow-100 text-yellow-600{% endif %}">
+                                {{ case_item.status|upper }}
+                            </span>
+                        </td>
+                        <td class="p-3">
+                            <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs font-semibold">HIGH</span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <a href="{% url 'deletecase' case_item.id 'newcase' %}" 
+                               onclick="return confirm('Archive this case?')" 
+                               class="text-red-500 hover:text-red-700 font-medium">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center p-10 text-gray-400">No official cases currently active.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
-        <h3 class="text-center">Child Locator Reports</h3>
-        <div class="row">
-            {% for locator in child_locators %}
-            <div class="col-md-4 col-sm-6 mb-4 d-flex align-items-stretch">
-                <div class="card w-100">
-                    <div class="card-body">
-                        <div class="text-center">
-                            {% if locator.image %}
-                                <img src="{{ locator.image.url }}" alt="Photo of {{ locator.full_name }}" class="img-fluid">
-                            {% else %}
-                                <img src="" alt="No Photo Available" class="img-fluid">
-                            {% endif %}
-                        </div>
-                        <h5 class="card-title mt-3">{{ locator.full_name }}</h5>
-                        <p class="card-text">
-                            <strong>Date of Birth:</strong> {{ locator.date_of_birth }}<br>
-                            <strong>Gender:</strong> {{ locator.get_gender_display }}<br>
-                            <strong>Last Seen Location:</strong> {{ locator.last_seen_location }}<br>
-                            <strong>Last Seen Date:</strong> {{ locator.last_seen_date }}<br>
-                            <strong>Guardian Name:</strong> {{ locator.guardian_name }}<br>
-                        </p>
-                        <div class="text-center">
-                            <button class="btn btn-primary" onclick="window.location.href='#'">View Details</button>
-                            <a href="{% url 'deletecase' uid=locator.id model_type='childlocator' %}" class="btn btn-danger mt-2" onclick="return confirm('Are you sure you want to delete this locator report?')">Delete</a>
-                        </div>
-                    </div>
-                </div>
+        <div class="bg-white shadow-md rounded-lg p-5">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">Community Sightings (Child Locator)</h2>
+                <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">User Submitted</span>
             </div>
-            {% empty %}
-            <p class="text-center w-100">No child locator reports found.</p>
-            {% endfor %}
+            
+            <table class="w-full text-sm text-left">
+                <thead>
+                    <tr class="bg-gray-100 border-b">
+                        <th class="p-3 font-semibold text-gray-600">Tip ID</th>
+                        <th class="p-3 font-semibold text-gray-600">Subject Name</th>
+                        <th class="p-3 font-semibold text-gray-600">Sighting Image</th>
+                        <th class="p-3 font-semibold text-gray-600">Sighting Location</th>
+                        <th class="p-3 font-semibold text-gray-600">Date Logged</th>
+                        <th class="p-3 font-semibold text-gray-600 text-center">Verification</th>
+                        <th class="p-3 font-semibold text-gray-60 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for locator in child_locators %}
+                    <tr class="border-b hover:bg-gray-50 transition-colors">
+                        <td class="p-3 text-gray-500">#{{ locator.id }}</td>
+                        <td class="p-3 font-semibold text-purple-900">{{ locator.full_name }}</td>
+                        <td class="p-3">
+                            {% if locator.image %}
+                                <img src="{{ locator.image.url }}" class="case-img border-purple-200">
+                            {% else %}
+                                <div class="w-20 h-20 bg-gray-200 flex items-center justify-center rounded-lg text-[10px] text-gray-500">No Image</div>
+                            {% endif %}
+                        </td>
+                        <td class="p-3">{{ locator.last_seen_location }}</td>
+                        <td class="p-3 text-gray-500">{{ locator.last_seen_date }}</td>
+                        <td class="p-3 text-center">
+                            {% if locator.accept %}
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">VERIFIED</span>
+                            {% else %}
+                                <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">PENDING</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-3 text-center">
+                            <a href="{% url 'deletecase' locator.id 'childlocator' %}" 
+                               onclick="return confirm('Remove this sighting tip?')"
+                               class="text-red-500 hover:text-red-700 font-medium">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center p-10 text-gray-400">No sightings reported by the community yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

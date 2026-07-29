@@ -3,94 +3,32 @@
 <head>
     <title>Child Face Detection and Matching</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"],
-        input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .note {
-            font-size: 14px;
-            color: #666;
-            margin-top: 20px;
-        }
-        .location-status {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #666;
-        }
-        .loading {
-            color: #FFA500;
-        }
-        .success {
-            color: #4CAF50;
-        }
-        .error {
-            color: #F44336;
-        }
-        .spinner {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid rgba(0,0,0,0.1);
-            border-radius: 50%;
-            border-top-color: #09f;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 5px;
-            vertical-align: middle;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
+        button:hover { background-color: #45a049; }
+        .note { font-size: 14px; color: #666; margin-top: 20px; }
+        .location-status { margin-top: 5px; font-size: 12px; color: #666; }
+        .loading { color: #FFA500; }
+        .success { color: #4CAF50; }
+        .error { color: #F44336; }
+        .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(0,0,0,0.1); border-radius: 50%; border-top-color: #09f; animation: spin 1s ease-in-out infinite; margin-right: 5px; vertical-align: middle; }
+        #map { height: 250px; margin-top: 15px; border-radius: 8px; border: 1px solid #ccc; display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .map-hint { font-size: 11px; color: #007bff; margin-top: 5px; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Child Face Detection</h1>
         
-        <form method="post" enctype="multipart/form-data">
+        <form id="detection-form" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
             {% csrf_token %}
             
             <div class="form-group">
@@ -100,111 +38,119 @@
             
             <div class="form-group">
                 <label for="location">Current Location:</label>
-                <input type="text" id="location" name="location" required placeholder="e.g. 123 Main St, City, State">
+                <input type="text" id="location" name="location" required readonly placeholder="Detecting location...">
                 <div id="location-status" class="location-status">
                     <span class="spinner"></span>
-                    <span id="status-text" class="loading">Fetching your location...</span>
+                    <span id="status-text" class="loading">Detecting your position...</span>
                 </div>
+                <div id="coords" style="font-size: 10px; color: #999;"></div>
+                <div id="map-hint" class="map-hint">Wrong location? Click the map to set it manually.</div>
+                <button type="button" id="retry-location" style="width: auto; font-size: 12px; padding: 5px 10px; margin-top: 5px; display: none;">Retry GPS</button>
             </div>
+
+            <div id="map"></div>
             
             <input type="hidden" id="latitude" name="latitude">
             <input type="hidden" id="longitude" name="longitude">
             
-            <button type="submit">Detect and Match Face</button>
+            <button type="submit" style="margin-top: 15px;">Detect and Match Face</button>
         </form>
-        
-        <p class="note">
-            This system will compare the uploaded image against our database of missing children.
-            If a match is found, an alert will be sent to the appropriate contact.
-        </p>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
-        // Function to get user's current location
-        function getLocation() {
-            const locationInput = document.getElementById('location');
-            const locationStatus = document.getElementById('location-status');
-            const statusText = document.getElementById('status-text');
-            const latitudeField = document.getElementById('latitude');
-            const longitudeField = document.getElementById('longitude');
+        const latInput = document.getElementById('latitude');
+        const lonInput = document.getElementById('longitude');
+        const locInput = document.getElementById('location');
+        const statusText = document.getElementById('status-text');
+        const spinner = document.querySelector('.spinner');
+        const mapDiv = document.getElementById('map');
+        const mapHint = document.getElementById('map-hint');
+        let map, marker;
+
+        function setStatus(text, type) {
+            statusText.textContent = text;
+            statusText.className = type;
+            spinner.style.display = (type === 'loading') ? 'inline-block' : 'none';
+        }
+
+        function updateInputs(lat, lon, address = null) {
+            latInput.value = lat;
+            lonInput.value = lon;
+            document.getElementById('coords').textContent = `Coordinates: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
             
-            // Check if geolocation is available
-            if (navigator.geolocation) {
-                // Get the current position
-                navigator.geolocation.getCurrentPosition(
-                    // Success callback
-                    function(position) {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-                        
-                        // Store coordinates in hidden fields
-                        latitudeField.value = latitude;
-                        longitudeField.value = longitude;
-                        
-                        // Use reverse geocoding to get the address
-                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                // Extract address from response
-                                if (data && data.display_name) {
-                                    locationInput.value = data.display_name;
-                                    statusText.textContent = "Location detected successfully";
-                                    statusText.className = "success";
-                                    locationStatus.querySelector('.spinner').style.display = 'none';
-                                } else {
-                                    // If we have coordinates but no address, show coordinates
-                                    locationInput.value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-                                    statusText.textContent = "Coordinates detected (address not available)";
-                                    statusText.className = "success";
-                                    locationStatus.querySelector('.spinner').style.display = 'none';
-                                }
-                            })
-                            .catch(error => {
-                                // If reverse geocoding fails, just use coordinates
-                                locationInput.value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-                                statusText.textContent = "Coordinates detected (address not available)";
-                                statusText.className = "success";
-                                locationStatus.querySelector('.spinner').style.display = 'none';
-                            });
-                    },
-                    // Error callback
-                    function(error) {
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED:
-                                statusText.textContent = "Location access denied. Please enter location manually.";
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                statusText.textContent = "Location information unavailable. Please enter location manually.";
-                                break;
-                            case error.TIMEOUT:
-                                statusText.textContent = "Location request timed out. Please enter location manually.";
-                                break;
-                            default:
-                                statusText.textContent = "An unknown error occurred. Please enter location manually.";
-                        }
-                        statusText.className = "error";
-                        locationStatus.querySelector('.spinner').style.display = 'none';
-                    }
-                );
+            if (address) {
+                locInput.value = address;
             } else {
-                // Geolocation not supported
-                statusText.textContent = "Geolocation is not supported by this browser. Please enter location manually.";
-                statusText.className = "error";
-                locationStatus.querySelector('.spinner').style.display = 'none';
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        locInput.value = data.display_name || `Lat: ${lat}, Lon: ${lon}`;
+                    });
             }
         }
-        
-        // Initialize location fetching when the page loads
-        document.addEventListener('DOMContentLoaded', getLocation);
-        
-        // Allow manual override by typing
-        document.getElementById('location').addEventListener('input', function() {
-            const statusText = document.getElementById('status-text');
-            if (this.value && this.value.trim() !== '') {
-                statusText.textContent = "Using manually entered location";
-                statusText.className = "success";
+
+        function initMap(lat, lon) {
+            mapDiv.style.display = 'block';
+            mapHint.style.display = 'block';
+            
+            if (!map) {
+                map = L.map('map').setView([lat, lon], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                marker = L.marker([lat, lon], {draggable: true}).addTo(map);
+
+                // Accuracy Improvement: Allow clicking to set exact location
+                map.on('click', function(e) {
+                    const newLat = e.latlng.lat;
+                    const newLon = e.latlng.lng;
+                    marker.setLatLng([newLat, newLon]);
+                    updateInputs(newLat, newLon);
+                    setStatus('Location updated manually.', 'success');
+                });
+
+                marker.on('dragend', function() {
+                    const pos = marker.getLatLng();
+                    updateInputs(pos.lat, pos.lng);
+                    setStatus('Location updated via marker drag.', 'success');
+                });
+            } else {
+                map.setView([lat, lon], 16);
+                marker.setLatLng([lat, lon]);
             }
-        });
+        }
+
+        function getPreciseLocation() {
+            setStatus('Requesting high-accuracy GPS...', 'loading');
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const lat = pos.coords.latitude;
+                        const lon = pos.coords.longitude;
+                        updateInputs(lat, lon);
+                        initMap(lat, lon);
+                        setStatus('High-accuracy location found.', 'success');
+                    },
+                    () => {
+                        setStatus('GPS failed. Using IP fallback...', 'error');
+                        fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
+                            updateInputs(data.latitude, data.longitude, `${data.city}, ${data.region} (Approx)`);
+                            initMap(data.latitude, data.longitude);
+                        });
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            }
+        }
+
+        function validateForm() {
+            if (!latInput.value) {
+                alert("Please wait for location detection or click on the map.");
+                return false;
+            }
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', getPreciseLocation);
     </script>
 </body>
 </html>

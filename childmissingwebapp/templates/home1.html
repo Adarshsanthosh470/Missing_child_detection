@@ -83,27 +83,17 @@
 		<header id="header-top" class="header-top">
 			<ul>
 				<li>
-					<div class="header-top-left">
-						<ul>
-							<li class="select-opt">
-								<select name="language" id="language">
-									<option value="default">EN</option>
-									<option value="Bangla">BN</option>
-									<option value="Arabic">AB</option>
-								</select>
-							</li>
-						</ul>
-					</div>
+					
 				</li>
 				<li class="head-responsive-right pull-right">
 					<div class="header-top-right">
 						<ul>
 							<li class="header-top-contact">
-								+1 222 777 6565
+								1098 Emergency Helpline
 							</li>
 							<li class="header-top-contact">
-								<a href="/index1/">Logout</a>
-							</li>
+    <a href="{% url 'logout' %}">Logout</a>
+</li>
 						</ul>
 					</div>
 				</li>
@@ -137,7 +127,6 @@
 			                    <li class="scroll"><a href="#works">how it works</a></li>
 			                    <li class="scroll"><a href="#child-list">explore</a></li>
 			                    <li class="scroll"><a href="#reviews">review</a></li>
-			                    <li class="scroll"><a href="#blog">blog</a></li>
 			                    <li class="scroll"><a href="#contact">contact</a></li>
                                 <li class="nav-link"><a href="/profile/">Profile</a></li>
 			                </ul><!--/.nav -->
@@ -161,31 +150,8 @@
 					</p>
 				</div>
 				<div class="welcome-hero-serch-box">
-					<div class="welcome-hero-form">
-						<div class="single-welcome-hero-form">
-							<h3>what?</h3>
-							<form action="home1.html">
-								<input type="text" placeholder="" />
-							</form>
-							<div class="welcome-hero-form-icon">
-								<i class="flaticon-list-with-dots"></i>
-							</div>
-						</div>
-						<div class="single-welcome-hero-form">
-							<h3>location</h3>
-							<form action="home1.html">
-								<input type="text" placeholder="Ex: london, newyork, rome" />
-							</form>
-							<div class="welcome-hero-form-icon">
-								<i class="flaticon-gps-fixed-indicator"></i>
-							</div>
-						</div>
-					</div>
-					<div class="welcome-hero-serch">
-						<button class="welcome-hero-btn" onclick="window.location.href='#'">
-							 search  <i data-feather="search"></i> 
-						</button>
-					</div>
+					
+					
 				</div>
 			</div>
 
@@ -212,7 +178,7 @@
 								</div>
 								<h2><a href="#">Report <span> a </span> case</a></h2>
 								<p>
-									Lorem ipsum dolor sit amet, consecte adipisicing elit, sed do eiusmod tempor incididunt ut laboremagna aliqua. 
+									Quickly register details of a missing child to initiate the search process. Our system immediately begins cross-referencing provided information with local and national databases
 								</p>
 								<button class="welcome-hero-btn how-work-btn" onclick="window.location.href='/reportcase/'">
 									read more
@@ -226,7 +192,7 @@
 								</div>
 								<h2><a href="/detect-face/">find <span> what you want</span></a></h2>
 								<p>
-									Lorem ipsum dolor sit amet, consecte adipisicing elit, sed do eiusmod tempor incididunt ut laboremagna aliqua. 
+									Use our intelligent search engine to filter through existing records. You can search by physical attributes, last known location, or specific timeframes to find relevant leads
 								</p>
 								<button class="welcome-hero-btn how-work-btn" onclick="window.location.href='/detect-face/'">
 									Click Here
@@ -244,7 +210,7 @@
 								</div>
 								<h2><a href="/detect-face/">Verify from video</span></a></h2>
 								<p>
-									Lorem ipsum dolor sit amet, consecte adipisicing elit, sed do eiusmod tempor incididunt ut laboremagna aliqua. 
+									Upload CCTV footage or street recordings to our AI engine. The platform uses DeepFace technology to scan frames and identify matches against our database of missing persons in real-time
 								</p>
 								<button class="welcome-hero-btn how-work-btn" onclick="window.location.href='/detect_child/'">
 									Click Here
@@ -254,20 +220,7 @@
 
 
 
-			<div class="col-md-4 col-sm-6">
-							<div class="single-how-works">
-								<div class="single-how-works-icon">
-									<i class="flaticon-networking"></i>
-								</div>
-								<h2><a href="/posts/">Social Media</span></a></h2>
-								<p>
-									Lorem ipsum dolor sit amet, consecte adipisicing elit, sed do eiusmod tempor incididunt ut laboremagna aliqua. 
-								</p>
-								<button class="welcome-hero-btn how-work-btn" onclick="window.location.href='/posts/'">
-									Click Here
-								</button>
-							</div>
-						</div>
+			
 
 
 
@@ -279,9 +232,9 @@
 								</div>
 								<h2><a href="#">Database <span> of </span>lost children</a></h2>
 								<p>
-									Lorem ipsum dolor sit amet, consecte adipisicing elit, sed do eiusmod tempor incididunt ut laboremagna aliqua. 
+									This centralized database is updated continuously to ensure rescuers have the most current information available.
 								</p>
-								<button class="welcome-hero-btn how-work-btn" onclick="window.location.href='/listcase/'">
+								<button class="welcome-hero-btn how-work-btn" onclick="window.location.href='/NewCase_list/'">
 									read more
 								</button>
 							</div>
@@ -374,7 +327,7 @@
             </div>
 
 			<div class="security_btn">
-				<button class="royal-blue-btn" onclick="location.href='/listcase/'">View All</button>
+				<button class="royal-blue-btn" onclick="location.href='/caselist/'">View All</button>
 			  </div>
         </section>
         
@@ -422,64 +375,6 @@
 		
 		<!--/.reviews-->
 		<!--reviews end -->
-
-		<!--blog start -->
-		<section id="blog" class="blog" >
-			<div class="container">
-				<div class="section-header">
-					<h2>news and articles</h2>
-					<p>Always upto date with our latest News and Articles </p>
-				</div><!--/.section-header-->
-				<div class="blog-content">
-					<div class="row">
-						<div class="col-md-4 col-sm-6">
-							<div class="single-blog-item">
-								<div class="single-blog-item-img">
-									<img src="{% static 'assets/images/blog/b1.jpg'%}" alt="blog image">
-								</div>
-								<div class="single-blog-item-txt">
-									<h2><a href="#">How to find your Desired Place more quickly</a></h2>
-									<h4>posted <span>by</span> <a href="#">admin</a> march 2018</h4>
-									<p>
-										Lorem ipsum dolor sit amet, consectetur de adipisicing elit, sed do eiusmod tempore incididunt ut labore et dolore magna.
-									</p>
-								</div>
-							</div>
-						</div>
-						<div class="col-md-4 col-sm-6">
-							<div class="single-blog-item">
-								<div class="single-blog-item-img">
-									<img src="{% static 'assets/images/blog/b2.jpg'%}" alt="blog image">
-								</div>
-								<div class="single-blog-item-txt">
-									<h2><a href="#">How to find your Desired Place more quickly</a></h2>
-									<h4>posted <span>by</span> <a href="#">admin</a> march 2018</h4>
-									<p>
-										Lorem ipsum dolor sit amet, consectetur de adipisicing elit, sed do eiusmod tempore incididunt ut labore et dolore magna.
-									</p>
-								</div>
-							</div>
-						</div>
-						<div class="col-md-4 col-sm-6">
-							<div class="single-blog-item">
-								<div class="single-blog-item-img">
-									<img src="{% static 'assets/images/blog/b3.jpg'%}" alt="blog image">
-								</div>
-								<div class="single-blog-item-txt">
-									<h2><a href="#">How to find your Desired Place more quickly</a></h2>
-									<h4>posted <span>by</span> <a href="#">admin</a> march 2018</h4>
-									<p>
-										Lorem ipsum dolor sit amet, consectetur de adipisicing elit, sed do eiusmod tempore incididunt ut labore et dolore magna.
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div><!--/.container-->
-			
-		</section><!--/.blog-->
-		<!--blog end -->
 
 		<!--subscription strat -->
 		<section id="contact"  class="subscription">
@@ -531,13 +426,11 @@
 				<div class="hm-footer-copyright">
 					<div class="row">
 						<div class="col-sm-5">
-							<p>
-								&copy;copyright. designed and developed by <a href="https://www.themesine.com/">themesine</a>
-							</p><!--/p-->
+							<p></p><!--/p-->
 						</div>
 						<div class="col-sm-7">
 							<div class="footer-social">
-								<span><i class="fa fa-phone"> +1  (222) 777 8888</i></span>
+								<span><i class="fa fa-phone"> 1098 Emergency Helpline</i></span>
 								<a href="#"><i class="fa fa-facebook"></i></a>	
 								<a href="#"><i class="fa fa-twitter"></i></a>
 								<a href="#"><i class="fa fa-linkedin"></i></a>
