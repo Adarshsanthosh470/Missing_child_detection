@@ -74,8 +74,9 @@ tensorflow==2.15.0
 tensorflow-estimator==2.15.0
 tensorflow-io-gcs-filesystem==0.31.0
 termcolor==3.3.0
-tf_keras==2.21.0
-tqdm==4.70.0
+git add requirements.txt
+git commit -m "Fix TensorFlow dependency conflict"
+git push origin maintqdm==4.70.0
 typing_extensions==4.16.0
 tzdata==2026.3
 urllib3==2.7.0
