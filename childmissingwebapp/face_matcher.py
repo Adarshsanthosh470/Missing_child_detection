@@ -1,12 +1,17 @@
 import os
-from deepface import DeepFace
 from django.conf import settings
+
+# Prevent TensorFlow from allocating GPU resources and reduce logs
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 def match_with_missing_children(uploaded_image_path):
     """
     Compares an uploaded person image with all images inside
     media/child_locator_images/ using the highly accurate Facenet512 model.
     """
+    # Lazy import to prevent importing TensorFlow/DeepFace at Django startup
+    from deepface import DeepFace
 
     child_folder = os.path.join(settings.MEDIA_ROOT, "child_locator_images")
     
@@ -15,8 +20,10 @@ def match_with_missing_children(uploaded_image_path):
         print(f"Error: Folder {child_folder} not found.")
         return False
 
-    child_images = [os.path.join(child_folder, img) for img in os.listdir(child_folder) 
-                    if img.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    child_images = [
+        os.path.join(child_folder, img) for img in os.listdir(child_folder) 
+        if img.lower().endswith(('.png', '.jpg', '.jpeg'))
+    ]
 
     for child_img in child_images:
         try:
