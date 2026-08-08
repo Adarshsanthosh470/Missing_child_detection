@@ -29,8 +29,8 @@ ALLOWED_HOSTS = [
     'trackwiise.netlify.app', 
     '127.0.0.1', 
     'localhost',
-    'yourusername.pythonanywhere.com',  # <-- REPLACE 'yourusername' with your actual PythonAnywhere username
-    'your-backend-domain.onrender.com'
+    'missing-child-detection.onrender.com',
+    '.onrender.com',
 ]
 
 
