@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-opcy2###6#^7(br=(@g2m(^&&)h9&+q+g*82ar!5v!ikz#zn&a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'trackwiise.netlify.app', 
